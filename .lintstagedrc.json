@@ -1,0 +1,3 @@
+{
+  "./apps/**/*.{js,ts}": [ "npm run lint:fix", "prettier --list-different" ]
+}
