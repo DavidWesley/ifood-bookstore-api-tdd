@@ -1,12 +1,13 @@
 {
 	"cSpell.enableFiletypes": [
 		"!json",
-		"ts"
+		"ts",
 	],
 	"cSpell.words": [
 		"express",
 		"rentcars",
-		"tsup"
+		"tsup",
+		"sqlite"
 	],
 	"editor.formatOnSave": true,
 	"typescript.suggest.autoImports": true,
