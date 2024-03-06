@@ -1,2 +1,2 @@
-# ts-node-config-template
-Inicializar um repositório Typescript com todas as configurações necessárias
+# Final test
+Repositório de resolução do projeto final em grupo do módulo de testes no curso de backend.
