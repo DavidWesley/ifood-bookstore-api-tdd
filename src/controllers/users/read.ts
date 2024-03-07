@@ -1,5 +1,6 @@
 import { IUsersRepository } from "@/interfaces/repositories/users.ts"
 import { Request, Response } from "express"
+import { StatusCodes } from "http-status-codes"
 import { Logger } from "winston"
 
 export class ReadUsersController {
@@ -26,6 +27,9 @@ export class ReadUsersController {
     }
 
     public async list(req: Request, res: Response): Promise<void> {
-        res.status(501).send({ message: "not implemented yet!" })
+        const users = await this.usersRepository.listAll()
+        res.status(StatusCodes.OK).send(users)
+
+        // res.status(501).send({ message: "not implemented yet!" })
     }
 }

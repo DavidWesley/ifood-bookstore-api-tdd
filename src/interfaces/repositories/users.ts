@@ -1,7 +1,8 @@
 import { User } from "../models/users.ts"
 
 export interface IUsersRepository {
-    create(newUser: Omit<User, "id">): Promise<User>
-    getById(id: User["id"]): Promise<User | undefined>
-    getByEmail(email: User["email"]): Promise<User | undefined>
+    create(newUser: Required<Omit<User, "id">>): Promise<Required<User>>
+    getById(id: NonNullable<User["id"]>): Promise<Required<User> | undefined>
+    getByEmail(email: NonNullable<User["email"]>): Promise<Required<User> | undefined>
+    listAll(): Promise<Required<User>[]>
 }

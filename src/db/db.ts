@@ -11,3 +11,5 @@ export const db = drizzle(connection, {
     logger: ENV.NODE_ENV !== "production",
     schema,
 })
+
+export { schema }

@@ -1,27 +1,56 @@
-import { randomUUID } from "node:crypto"
-
+import { db, schema } from "@/db/db.ts"
 import { NewUser, User } from "@/interfaces/models/users.ts"
 import { IUsersRepository } from "@/interfaces/repositories/users.ts"
 
-// TODO:
-// import { UsersModel } from "../db/models/Users.ts"
-
 export class UsersRepository implements IUsersRepository {
-    public async create(newUser: NewUser): Promise<User> {
-        const id = randomUUID()
-        // const user = await UsersModel.create({ id, ...newUser })
-        // return user.dataValues
+    protected static convert(dbUser: typeof schema.users.$inferSelect) {
+        const data: Required<User> = {
+            id: dbUser.id,
+            email: dbUser.email,
+            name: dbUser.name,
+        }
+
+        return data
     }
 
-    public async getById(id: string): Promise<User | undefined> {
-        // const user = await UsersModel.findOne({ where: { id } })
-        // if (!user) return undefined
-        // return user.dataValues
+    public async create(newUser: NewUser): Promise<Required<User>> {
+        const [createdUser] = await db
+            .insert(schema.users)
+            .values([
+                {
+                    email: newUser.email,
+                    name: newUser.name,
+                },
+            ])
+            .returning({ id: schema.users.id })
+
+        const user = await this.getById(createdUser!.id)
+
+        if (!user) throw new Error("Não foi possível cadastrar no banco")
+
+        return user
     }
 
-    public async getByEmail(email: string): Promise<User | undefined> {
-        // const user = await UsersModel.findOne({ where: { email } })
-        // if (!user) return undefined
-        // return user.dataValues
+    public async getById(id: User["id"]): Promise<Required<User> | undefined> {
+        const user = await db.query.users.findFirst({
+            where: (table, { eq }) => eq(table.id, id),
+        })
+
+        if (!user) return undefined
+        return UsersRepository.convert(user)
+    }
+
+    public async getByEmail(email: User["email"]): Promise<Required<User> | undefined> {
+        const user = await db.query.users.findFirst({
+            where: (table, { eq }) => eq(table.email, email),
+        })
+
+        if (!user) return undefined
+        return UsersRepository.convert(user)
+    }
+
+    public async listAll(): Promise<Required<User>[]> {
+        const users = await db.query.users.findMany()
+        return users.map(UsersRepository.convert)
     }
 }
