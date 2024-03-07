@@ -3,7 +3,7 @@ import { NewUser, User } from "@/interfaces/models/users.ts"
 import { IUsersRepository } from "@/interfaces/repositories/users.ts"
 
 export class UsersRepository implements IUsersRepository {
-    protected static convert(dbUser: typeof schema.users.$inferSelect) {
+    protected static convert(dbUser: typeof schema.users.$inferSelect): Required<User> {
         const data: Required<User> = {
             id: dbUser.id,
             email: dbUser.email,
@@ -22,13 +22,11 @@ export class UsersRepository implements IUsersRepository {
                     name: newUser.name,
                 },
             ])
-            .returning({ id: schema.users.id })
+            .returning()
 
-        const user = await this.getById(createdUser!.id)
+        if (!createdUser) throw new Error("Não foi possível cadastrar no banco")
 
-        if (!user) throw new Error("Não foi possível cadastrar no banco")
-
-        return user
+        return UsersRepository.convert(createdUser)
     }
 
     public async getById(id: User["id"]): Promise<Required<User> | undefined> {
