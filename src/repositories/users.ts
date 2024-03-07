@@ -3,7 +3,7 @@ import { NewUser, User } from "@/interfaces/models/users.ts"
 import { IUsersRepository } from "@/interfaces/repositories/users.ts"
 
 export class UsersRepository implements IUsersRepository {
-    protected static convert(dbUser: typeof schema.users.$inferSelect): Required<User> {
+    public static convert(dbUser: typeof schema.users.$inferSelect): Required<User> {
         const data: Required<User> = {
             id: dbUser.id,
             email: dbUser.email,

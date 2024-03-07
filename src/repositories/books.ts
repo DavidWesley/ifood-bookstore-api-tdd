@@ -4,7 +4,7 @@ import { IBooksRepository } from "@/interfaces/repositories/books.ts"
 import { eq } from "drizzle-orm"
 
 export class BooksRepository implements IBooksRepository {
-    protected static convert(dbBook: typeof schema.books.$inferSelect): Required<Book> {
+    public static convert(dbBook: typeof schema.books.$inferSelect): Required<Book> {
         const data: Required<Book> = {
             id: dbBook.id,
             subtitle: dbBook.subtitle,
