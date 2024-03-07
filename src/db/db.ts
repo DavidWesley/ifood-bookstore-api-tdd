@@ -1,10 +1,12 @@
+import path from "node:path"
 import { ENV } from "@/env.ts"
 import Database from "better-sqlite3"
 import { drizzle } from "drizzle-orm/better-sqlite3"
 
 import * as schema from "./schema/index.ts"
 
-export const connection = new Database("./sqlite.db", { fileMustExist: false, readonly: false })
+const DATABASE_PATH = path.resolve(import.meta.dirname, "sqlite.db")
+export const connection = new Database(DATABASE_PATH, { fileMustExist: true, readonly: false })
 export const db = drizzle(connection, {
     logger: ENV.NODE_ENV !== "production",
     schema,
