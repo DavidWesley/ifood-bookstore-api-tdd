@@ -1,11 +1,12 @@
+import { UUID } from "crypto"
 import { Book } from "./books.ts"
 import { User } from "./users.ts"
 
 export type BooksRental = {
-    id: string
-    book_id: string
+    id: UUID
+    book_id: Book["id"]
     book?: Book
-    user_id: string
+    user_id: User["id"]
     user?: User
     rented_at: Date
     rental_time: Date
