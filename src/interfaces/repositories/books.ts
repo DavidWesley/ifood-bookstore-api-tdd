@@ -1,10 +1,10 @@
 import { Book } from "../models/books.ts"
 
 export interface IBooksRepository {
-    create(newBook: Omit<Book, "id">): Promise<Book>
-    getById(id: string): Promise<Book | undefined>
-    getByTitle(title: string): Promise<Book | undefined>
-    list(): Promise<Book[]>
-    update(id: string, book: Omit<Book, "id">): Promise<void>
-    delete(id: string): Promise<void>
+    create(newBook: Omit<Book, "id">): Promise<Required<Book>>
+    getById(id: Book["id"]): Promise<Required<Book> | undefined>
+    getByTitle(title: Book["title"]): Promise<Required<Book> | undefined>
+    listAll(): Promise<Required<Book>[]>
+    update(id: Book["id"], book: Partial<Omit<Book, "id">>): Promise<void>
+    delete(id: Book["id"]): Promise<void>
 }

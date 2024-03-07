@@ -1,5 +1,7 @@
+import { UUID } from "node:crypto"
+
 export type Book = {
-    id: string
+    id: UUID
     title: string
     subtitle: string
     publishing_company: string

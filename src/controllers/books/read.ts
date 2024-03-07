@@ -27,7 +27,7 @@ export class ReadBooksController {
 
     public async list(req: Request, res: Response): Promise<void> {
         try {
-            const book = await this.booksRepository.list()
+            const book = await this.booksRepository.listAll()
             res.status(200).json(book)
             return
         } catch (err) {
