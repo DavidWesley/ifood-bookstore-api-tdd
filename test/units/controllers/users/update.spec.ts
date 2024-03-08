@@ -2,7 +2,7 @@ import { Book, NewBook } from "@/interfaces/models/books.ts"
 import { fakerEN } from "@faker-js/faker"
 import { Request, Response } from "express"
 import { beforeEach, describe, it, vitest } from "vitest"
-import { UpdateUsersController } from "../../../src/controllers/users/update.ts"
+import { UpdateUsersController } from "../../../../src/controllers/users/update.ts"
 import { logger } from "../../mocks/logger.ts"
 import { usersRepositoryMock } from "../../mocks/users_repository.ts"
 

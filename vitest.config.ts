@@ -6,8 +6,7 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     watch: true,
-    includeSource: ["test"],
-    include: ["./**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    include: ["./test/units/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     watchExclude: [...configDefaults.watchExclude],
     globals: false,
     root: "./",

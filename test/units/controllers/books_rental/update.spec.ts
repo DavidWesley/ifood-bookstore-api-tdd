@@ -2,7 +2,7 @@ import { BooksRental, NewBooksRental } from "@/interfaces/models/booksRental.ts"
 import { fakerEN } from "@faker-js/faker"
 import { Request, Response } from "express"
 import { beforeEach, describe, it, vitest } from "vitest"
-import { UpdateBooksRentalController } from "../../../src/controllers/books_rental/update.ts"
+import { UpdateBooksRentalController } from "../../../../src/controllers/books_rental/update.ts"
 import { booksRentalRepositoryMock } from "../../mocks/books_rental_repository.ts"
 import { logger } from "../../mocks/logger.ts"
 
