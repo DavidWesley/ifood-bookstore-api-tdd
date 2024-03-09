@@ -1,8 +1,13 @@
-import { CreateUsersController } from "@/controllers/users/create.ts"
-import { NewUser, User } from "@/interfaces/models/users.ts"
+import { UUID } from "node:crypto"
+
 import { fakerEN } from "@faker-js/faker"
 import { Request, Response } from "express"
+import { StatusCodes } from "http-status-codes"
 import { beforeEach, describe, expect, it, vitest } from "vitest"
+
+import { CreateUsersController } from "@/controllers/users/create.ts"
+import { NewUser, User } from "@/interfaces/models/users.ts"
+
 import { logger } from "../../mocks/logger.ts"
 import { usersRepositoryMock } from "../../mocks/users_repository.ts"
 
@@ -10,34 +15,32 @@ describe("CreateUsersController", () => {
     function makeSut() {
         const controller = new CreateUsersController(logger, usersRepositoryMock)
 
-        const newUserMock: NewUser = {
+        const newUser: NewUser = {
             name: fakerEN.internet.userName(),
             email: fakerEN.internet.email(),
         }
 
-        const userMock: User = {
-            id: fakerEN.string.uuid(),
-            ...newUserMock,
+        const user: User = {
+            id: fakerEN.string.uuid() as UUID,
+            ...newUser,
         }
 
-        const requestMock = { body: newUserMock } as Request
+        const request = { body: newUser } as Request
 
-        const responseMock = {
+        const response = {
             statusCode: 0,
             status: (status: number) => {
-                responseMock.statusCode = status
+                response.statusCode = status
                 return {
                     json: vitest.fn(),
-                } as any
+                } as unknown
             },
         } as Response
 
         return {
-            controller,
-            newUserMock,
-            userMock,
-            requestMock,
-            responseMock,
+            mocks: { controller },
+            stubs: { request, response },
+            objects: { user, newUser },
         }
     }
 
@@ -46,39 +49,40 @@ describe("CreateUsersController", () => {
     })
 
     it("should create user if there is no other user with the same email", async () => {
-        const { controller, newUserMock, userMock, requestMock, responseMock } = makeSut()
-        vitest.spyOn(usersRepositoryMock, "getByEmail").mockResolvedValueOnce(undefined)
-        vitest.spyOn(usersRepositoryMock, "create").mockRejectedValueOnce(userMock)
+        const { mocks, objects, stubs } = makeSut()
 
-        const promise = controller.create(requestMock, responseMock)
+        vitest.spyOn(usersRepositoryMock, "getByEmail").mockResolvedValueOnce(undefined)
+        vitest.spyOn(usersRepositoryMock, "create").mockResolvedValueOnce(objects.user)
+
+        const promise = mocks.controller.create(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(usersRepositoryMock.getByEmail).toHaveBeenCalledWith(newUserMock.email)
-        expect(usersRepositoryMock.create).toHaveBeenCalledWith(newUserMock)
-        expect(responseMock.statusCode).toEqual(201)
+        expect(usersRepositoryMock.getByEmail).toHaveBeenCalledWith(objects.newUser.email)
+        expect(usersRepositoryMock.create).toHaveBeenCalledWith(objects.newUser)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.CREATED)
     })
 
     it("should return 409 if there is other user with the same email", async () => {
-        const { controller, newUserMock, userMock, requestMock, responseMock } = makeSut()
-        vitest.spyOn(usersRepositoryMock, "getByEmail").mockResolvedValueOnce(userMock)
+        const { mocks, objects, stubs } = makeSut()
+        vitest.spyOn(usersRepositoryMock, "getByEmail").mockResolvedValueOnce(objects.user)
         vitest.spyOn(usersRepositoryMock, "create")
 
-        const promise = controller.create(requestMock, responseMock)
+        const promise = mocks.controller.create(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(usersRepositoryMock.getByEmail).toHaveBeenCalledWith(newUserMock.email)
+        expect(usersRepositoryMock.getByEmail).toHaveBeenCalledWith(objects.newUser.email)
         expect(usersRepositoryMock.create).not.toHaveBeenCalled()
-        expect(responseMock.statusCode).toEqual(409)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.CONFLICT)
     })
 
     it("should return 500 if some error occur", async () => {
-        const { controller, newUserMock, userMock, requestMock, responseMock } = makeSut()
+        const { mocks, objects, stubs } = makeSut()
         vitest.spyOn(usersRepositoryMock, "getByEmail").mockRejectedValueOnce(new Error("some error"))
 
-        const promise = controller.create(requestMock, responseMock)
+        const promise = mocks.controller.create(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(usersRepositoryMock.getByEmail).toHaveBeenCalledWith(newUserMock.email)
-        expect(responseMock.statusCode).toEqual(500)
+        expect(usersRepositoryMock.getByEmail).toHaveBeenCalledWith(objects.newUser.email)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
     })
 })
