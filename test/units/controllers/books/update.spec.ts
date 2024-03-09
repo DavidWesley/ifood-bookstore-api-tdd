@@ -1,16 +1,21 @@
-import { Book, NewBook } from "@/interfaces/models/books.ts"
+import { UUID } from "node:crypto"
+
 import { fakerEN } from "@faker-js/faker"
 import { Request, Response } from "express"
 import { beforeEach, describe, expect, it, vitest } from "vitest"
+
+import { UpdateBooksController } from "@/controllers/books/update.ts"
+import { Book, NewBook } from "@/interfaces/models/books.ts"
+
+import { StatusCodes } from "http-status-codes"
 import { booksRepositoryMock } from "../../mocks/books_repository.ts"
 import { logger } from "../../mocks/logger.ts"
 
-import { UpdateBooksController } from "@/controllers/books/update.ts"
 describe("UpdateBooksController", () => {
     function makeSut() {
         const controller = new UpdateBooksController(logger, booksRepositoryMock)
 
-        const newBookMock: NewBook = {
+        const newBook: NewBook = {
             title: fakerEN.word.words(),
             subtitle: fakerEN.word.words(),
             publishing_company: fakerEN.company.name(),
@@ -18,33 +23,31 @@ describe("UpdateBooksController", () => {
             authors: fakerEN.internet.userName(),
         }
 
-        const bookMock: Book = {
-            id: fakerEN.string.uuid(),
-            ...newBookMock,
+        const book: Book = {
+            id: fakerEN.string.uuid() as UUID,
+            ...newBook,
         }
 
-        const requestMock = {
-            body: newBookMock,
-            params: { id: bookMock.id } as any,
+        const request = {
+            body: newBook,
+            params: { id: book.id } as Request["params"],
         } as Request
 
-        const responseMock = {
+        const response = {
             statusCode: 0,
             status: (status: number) => {
-                responseMock.statusCode = status
+                response.statusCode = status
                 return {
                     json: vitest.fn(),
                     send: vitest.fn(),
-                } as any
+                } as unknown
             },
         } as Response
 
         return {
-            controller,
-            newBookMock,
-            bookMock,
-            requestMock,
-            responseMock,
+            mocks: { controller },
+            stubs: { request, response },
+            objects: { newBook, book, },
         }
     }
 
@@ -53,15 +56,15 @@ describe("UpdateBooksController", () => {
     })
 
     it("should update and return book if the book exist", async () => {
-        const { controller, bookMock, requestMock, responseMock } = makeSut()
-        vitest.spyOn(booksRepositoryMock, "getById").mockResolvedValueOnce(bookMock)
+        const { mocks, objects, stubs } = makeSut()
+        vitest.spyOn(booksRepositoryMock, "getById").mockResolvedValueOnce(objects.book)
         vitest.spyOn(booksRepositoryMock, "update").mockResolvedValueOnce()
 
-        const promise = controller.update(requestMock, responseMock)
+        const promise = mocks.controller.update(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRepositoryMock.getById).toHaveBeenCalledWith(bookMock.id)
-        expect(responseMock.statusCode).toEqual(200)
+        expect(booksRepositoryMock.getById).toHaveBeenCalledWith(objects.book.id)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.OK)
     })
 
     it.todo("should return 404 statusCode and not update the book if there is no book with the id provided")
@@ -69,13 +72,13 @@ describe("UpdateBooksController", () => {
     it.todo("should return 409 statusCode and not update the book if there is a book with the same title")
 
     it("should return 500 if some error occur", async () => {
-        const { controller, newBookMock, bookMock, requestMock, responseMock } = makeSut()
+        const { mocks, objects, stubs } = makeSut()
         vitest.spyOn(booksRepositoryMock, "getById").mockRejectedValueOnce(new Error("some error"))
 
-        const promise = controller.update(requestMock, responseMock)
+        const promise = mocks.controller.update(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRepositoryMock.getById).toHaveBeenCalledWith(bookMock.id)
-        expect(responseMock.statusCode).toEqual(529)
+        expect(booksRepositoryMock.getById).toHaveBeenCalledWith(objects.book.id)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
     })
 })
