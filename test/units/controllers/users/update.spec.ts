@@ -15,7 +15,7 @@ describe("UpdateUsersController", () => {
             subtitle: fakerEN.word.words(),
             publishing_company: fakerEN.company.name(),
             published_at: fakerEN.date.anytime(),
-            authors: fakerEN.internet.userName(),
+            author: fakerEN.internet.userName(),
         }
 
         const bookMock: Book = {

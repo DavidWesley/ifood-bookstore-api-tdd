@@ -1,6 +1,7 @@
 import { db, schema } from "@/db/db.ts"
 import { Book, NewBook } from "@/interfaces/models/books.ts"
 import { IBooksRepository } from "@/interfaces/repositories/books.ts"
+import { copyNonNullChangeableProperties } from "@/utils/copyNonNullChangeableProperties.ts"
 import { eq } from "drizzle-orm"
 
 export class BooksRepository implements IBooksRepository {
@@ -9,7 +10,7 @@ export class BooksRepository implements IBooksRepository {
             id: dbBook.id,
             subtitle: dbBook.subtitle,
             title: dbBook.title,
-            authors: dbBook.author,
+            author: dbBook.author,
             published_at: dbBook.published_at as Date,
             publishing_company: dbBook.publishing_company,
         }
@@ -20,11 +21,12 @@ export class BooksRepository implements IBooksRepository {
     public async create(newBook: NewBook): Promise<Book> {
         const [createdBook] = await db
             .insert(schema.books)
+            // TODO: Lógica deve estar na Service
             .values([
                 {
                     title: newBook.title,
                     subtitle: newBook.subtitle,
-                    author: newBook.authors,
+                    author: newBook.author,
                     publishing_company: newBook.publishing_company,
                     published_at: new Date(newBook.published_at),
                 },
@@ -60,9 +62,11 @@ export class BooksRepository implements IBooksRepository {
     }
 
     public async update(id: Book["id"], book: Partial<NewBook>): Promise<void> {
+        const properties = copyNonNullChangeableProperties<Omit<Book, "id">>(book) as Omit<Book, "id">
+
         await db
             .update(schema.books)
-            .set({ ...book })
+            .set({ ...properties })
             .where(eq(schema.books.id, id))
     }
 

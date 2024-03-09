@@ -8,7 +8,7 @@ export class UpdateBooksController {
     constructor(
         private readonly logger: Logger,
         private readonly booksRepository: IBooksRepository
-    ) {}
+    ) { }
 
     public async update(req: Request<any, any, NewBook>, res: Response): Promise<void> {
         const { id } = req.params
@@ -28,6 +28,9 @@ export class UpdateBooksController {
                     return
                 }
             }
+
+            body.published_at = new Date(body.published_at)
+            console.log(body)
 
             await this.booksRepository.update(id, body)
 

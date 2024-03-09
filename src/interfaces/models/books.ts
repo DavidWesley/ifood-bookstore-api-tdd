@@ -6,7 +6,7 @@ export type Book = {
     subtitle: string
     publishing_company: string
     published_at: Date
-    authors: string
+    author: string
 }
 
 export type NewBook = Omit<Book, "id">
