@@ -1,68 +1,158 @@
-# Bookstore API - TDD Practice with Vitest
+# Bookstore API
 
-The Bookstore API is a study project focused on Test-Driven Development (TDD) using Vitest. It provides HTTP endpoints for managing books, book rentals, and user information. This README.md serves as a guide to understand the project structure, installation process, usage instructions, and available scripts.
+The Bookstore API is a study project focused on Test-Driven Development (TDD). It provides HTTP endpoints for managing books, book rentals, and user information.
 
-This project was developed as part of the final test of the TDD module provided by Ada tech in collaboration with iFood.
+This project was developed as part of the final test of the TDD module provided by [Ada tech](https://ada.tech/) in collaboration with iFood.
+
+## 💻 Technologies
+
+- [Typescript](https://www.typescriptlang.org/)
+- [Express](https://github.com/expressjs/express)
+- [TSX](https://github.com/privatenumber/tsx)
+- [Tsup](https://tsup.egoist.dev/)
+- [BiomeJS](https://biomejs.dev/)
+- [Drizzle ORM](https://orm.drizzle.team/)
+- [Vitest](https://vitest.dev/)
+- [Zod](https://zod.dev/)
 
 ## Installation
 
 To install the project and its dependencies, follow these steps:
 
-1. Clone the repository:
+### Prerequisites
 
-```bash
-git clone <repository-url>
-cd <project-directory>
-```
+Before install the project, make sure you have the following tools installed:
 
-2. Install dependencies:
+- [NodeJS](https://nodejs.org/)
+- [Git](https://git-scm.com/)
 
-```bash
-npm install
-```
+Now, follow the steps below to use the project:
+
+1. **Clone the Repository:**
+
+   ```bash
+    git clone https://github.com/DavidWesley/ifood-bookstore-api-tdd bookstore-api
+
+    cd bookstore-api
+   ```
+
+2. **Navigate to the Project Directory:**
+
+   ```bash
+   cd your-project
+   ```
+
+3. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
 ## Usage
 
-To run tests, use the following command:
+There are two ways to run the project, each serving a different purpose:
 
-```bash
-npm test
-```
+#### Development Mode
 
-## Routes
+This mode is suitable for active development, providing features like hot-reloading and enhanced debugging tools.
 
-### Books
+1. **Run in development mode:**
 
--   **POST /v1/books**: Create a new book.
--   **GET /v1/books**: Retrieve a list of all books.
--   **GET /v1/books/:id**: Retrieve a specific book by ID.
--   **PUT /v1/books/:id**: Update an existing book by ID.
--   **DELETE /v1/books/:id**: Delete a book by ID.
+   ```bash
+   npm run dev
+   ```
 
-### Book Rentals
+2. **Access the Application:**
+   - Open your browser and go to **[http://localhost:3000](http://localhost:3000)**.
 
--   **POST /v1/rental/books**: Rent a book.
--   **GET /v1/rental/books**: Retrieve a list of all book rentals.
--   **GET /v1/rental/books/:id**: Retrieve a specific book rental by ID.
--   **PUT /v1/rental/books/:id**: Update a book rental by ID.
--   **DELETE /v1/rental/books/:id**: Delete a book rental by ID.
+#### Build Mode
 
-### Users
+1. **Build the project:**
+   ```bash
+   npm run build
+   ```
+2. **Start in build mode:**
+   ```bash
+   npm start
+   ```
+3. **Access the Application:**
+   - Open your browser and go to **[http://localhost:3000](http://localhost:3000)**.
 
--   **POST /v1/users**: Create a new user.
--   **GET /v1/users**: Retrieve a list of all users.
--   **GET /v1/users/:id**: Retrieve a specific user by ID.
--   **PUT /v1/users/:id**: Update an existing user by ID.
+This mode optimizes the project for production, ~~maybe~~ ensuring better performance.
+
+## Running Tests
+
+To run tests for the project, use the following commands:
+
+1. **Run Tests:**
+   ```bash
+   npm run test
+   ```
+2. **Generate Coverage Report:**
+   ```bash
+   npm run test:coverage
+   ```
+3. **Run Tests in Watch Mode:**
+   ```bash
+   npm run test:watch
+   ```
+   These commands will execute the tests, generate a coverage report (optional), and run tests in watch mode for continuous testing.
 
 ## Scripts
 
 The following scripts are available:
 
--   **npm test**: Run tests.
--   **npm run test:watch**: Run tests in watch mode.
--   **npm run test:coverage**: Generate test coverage report.
--   **npm run lint**: Run linting checks.
--   **npm run format**: Format code.
--   **npm start**: Start the server in production mode.
--   **npm run dev**: Start the server in development mode.
--   **npm run build**: Build the project.
+- `npm test`: Run tests.
+- `npm run test:watch`: Run tests in watch mode.
+- `npm run test:coverage`: Generate test coverage report.
+- `npm run lint`: Run linting checks.
+- `npm run format`: Format code.
+- `npm start`: Start the server in production mode.
+- `npm run dev`: Start the server in development mode.
+- `npm run build`: Build the project.
+
+## 📍 API Routes
+
+The tables below provide a summary of the main API routes.
+For additional details on each route, please refer to [Routes.md](./docs/Routes.md).
+
+### Users Routes
+
+| Route           | HTTP Method | Description                                           |
+| --------------- | ----------- | ----------------------------------------------------- |
+| `/v1/users`     | GET         | Retrieves a list of all users.                        |
+| `/v1/users/:id` | GET         | Retrieves detailed information about a specific user. |
+| `/v1/users`     | POST        | Creates a new user based on the provided data.        |
+| `/v1/users/:id` | PUT         | Updates information for a specific user.              |
+| `/v1/users/:id` | DELETE      | Removes a specific user.                              |
+
+### Books Routes
+
+| Route           | HTTP Method | Description                                           |
+| --------------- | ----------- | ----------------------------------------------------- |
+| `/v1/books`     | GET         | Retrieves a list of all books.                        |
+| `/v1/books/:id` | GET         | Retrieves detailed information about a specific book. |
+| `/v1/books`     | POST        | Creates a new book based on the provided data.        |
+| `/v1/books/:id` | PUT         | Updates information for a specific book.              |
+| `/v1/books/:id` | DELETE      | Removes a specific book.                              |
+
+### Book Rentals Routes
+
+| Route                  | HTTP Method | Description                                                  |
+| ---------------------- | ----------- | ------------------------------------------------------------ |
+| `/v1/rental/books`     | GET         | Retrieves a list of all book rentals.                        |
+| `/v1/rental/books/:id` | GET         | Retrieves detailed information about a specific book rental. |
+| `/v1/rental/books`     | POST        | Creates a new book rental based on the provided data.        |
+| `/v1/rental/books/:id` | PUT         | Updates information for a specific book rental.              |
+| `/v1/rental/books/:id` | DELETE      | Removes a specific book rental.                              |
+
+Refer to [Routes.md](./docs/Routes.md) for detailed documentation on each route.
+
+
+## Contributors
+
+I appreciate all the individuals who have contributed to this project! 🙌
+
+- [@DavidWesley](https://github.com/DavidWesley) David Wesley
+- [@lgsrocha](https://github.com/lgsrocha) Lucas Rocha
+- [@Alan-Vasconi](https://github.com/Alan-Vasconi) Alan Vasconi
+- [@daniellabernardino](https://github.com/daniellabernardino) Daniella Maria
