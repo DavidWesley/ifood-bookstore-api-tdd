@@ -46,7 +46,7 @@ describe("ReadBooksRentalController", () => {
         return {
             mocks: { controller },
             stubs: { request, response },
-            objects: { newBooksRental, booksRental }
+            objects: { newBooksRental, booksRental },
         }
     }
 
@@ -91,8 +91,27 @@ describe("ReadBooksRentalController", () => {
     })
 
     describe("list", () => {
-        it.todo("should return the list of books rental")
+        it("should return the list of books rental", async () => {
+            const { mocks, objects, stubs } = makeSut()
+            const booksRentalsMock = [objects.booksRental, objects.booksRental]
+            vitest.spyOn(booksRentalRepositoryMock, "listAll").mockResolvedValueOnce(booksRentalsMock)
 
-        it.todo("should return 500 if some error occur")
+            const promise = mocks.controller.list(stubs.request, stubs.response)
+
+            await expect(promise).resolves.not.toThrow()
+            expect(booksRentalRepositoryMock.listAll).toHaveBeenCalled()
+            expect(stubs.response.statusCode).toEqual(200)
+        })
+
+        it("should return 500 if some error occur", async () => {
+            const { mocks, objects, stubs } = makeSut()
+            vitest.spyOn(booksRentalRepositoryMock, "listAll").mockRejectedValueOnce(new Error("some error"))
+
+            const promise = mocks.controller.list(stubs.request, stubs.response)
+
+            await expect(promise).resolves.not.toThrow()
+            expect(booksRentalRepositoryMock.listAll).toHaveBeenCalled()
+            expect(stubs.response.statusCode).toEqual(500)
+        })
     })
 })
