@@ -1,4 +1,5 @@
 import { IBooksRepository } from "@/interfaces/repositories/books.ts"
+import { UUID } from "crypto"
 import { Request, Response } from "express"
 import { Logger } from "winston"
 
@@ -6,13 +7,13 @@ export class ReadBooksController {
     constructor(
         private readonly logger: Logger,
         private readonly booksRepository: IBooksRepository
-    ) {}
+    ) { }
 
     public async getById(req: Request, res: Response): Promise<void> {
         const { id } = req.params
 
         try {
-            const book = await this.booksRepository.getById(id)
+            const book = await this.booksRepository.getById(id as UUID)
 
             if (book) res.status(200).json(book)
             else res.status(204).send()

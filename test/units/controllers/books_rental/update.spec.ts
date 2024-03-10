@@ -1,5 +1,6 @@
 import { BooksRental, NewBooksRental } from "@/interfaces/models/booksRental.ts"
 import { fakerEN } from "@faker-js/faker"
+import { UUID } from "crypto"
 import { Request, Response } from "express"
 import { beforeEach, describe, it, vitest } from "vitest"
 import { UpdateBooksRentalController } from "../../../../src/controllers/books_rental/update.ts"
@@ -11,14 +12,14 @@ describe("UpdateBooksRentalController", () => {
         const controller = new UpdateBooksRentalController(logger, booksRentalRepositoryMock)
 
         const newBooksRentalMock: NewBooksRental = {
-            book_id: fakerEN.string.uuid(),
-            user_id: fakerEN.string.uuid(),
+            book_id: fakerEN.string.uuid() as UUID,
+            user_id: fakerEN.string.uuid() as UUID,
             rented_at: fakerEN.date.anytime(),
             rental_time: fakerEN.date.anytime(),
         }
 
         const booksRentalMock: BooksRental = {
-            id: fakerEN.string.uuid(),
+            id: fakerEN.string.uuid() as UUID,
             ...newBooksRentalMock,
         }
 

@@ -2,6 +2,7 @@ import { ReadUsersController } from "@/controllers/users/read.ts"
 import { NewUser, User } from "@/interfaces/models/users.ts"
 import { fakerEN } from "@faker-js/faker"
 import { Request, Response } from "express"
+import { UUID } from "node:crypto"
 import { beforeEach, describe, expect, it, vitest } from "vitest"
 import { logger } from "../../mocks/logger.ts"
 import { usersRepositoryMock } from "../../mocks/users_repository.ts"
@@ -16,7 +17,7 @@ describe("ReadUsersController", () => {
         }
 
         const userMock: User = {
-            id: fakerEN.string.uuid(),
+            id: fakerEN.string.uuid() as UUID,
             ...newUserMock,
         }
 
@@ -51,7 +52,7 @@ describe("ReadUsersController", () => {
 
     describe("getById", () => {
         it("should return user if the user exist", async () => {
-            const { controller, newUserMock, userMock, requestMock, responseMock } = makeSut()
+            const { controller, userMock, requestMock, responseMock } = makeSut()
             vitest.spyOn(usersRepositoryMock, "getById").mockResolvedValueOnce(userMock)
 
             const promise = controller.getById(requestMock, responseMock)
@@ -62,7 +63,7 @@ describe("ReadUsersController", () => {
         })
 
         it("should return 204 with empty user if the user was not founded", async () => {
-            const { controller, newUserMock, userMock, requestMock, responseMock } = makeSut()
+            const { controller, userMock, requestMock, responseMock } = makeSut()
             vitest.spyOn(usersRepositoryMock, "getById").mockResolvedValueOnce(undefined)
 
             const promise = controller.getById(requestMock, responseMock)
@@ -73,7 +74,7 @@ describe("ReadUsersController", () => {
         })
 
         it("should return 500 if some error occur", async () => {
-            const { controller, newUserMock, userMock, requestMock, responseMock } = makeSut()
+            const { controller, userMock, requestMock, responseMock } = makeSut()
             vitest.spyOn(usersRepositoryMock, "getById").mockRejectedValueOnce(new Error("some error"))
 
             const promise = controller.getById(requestMock, responseMock)
@@ -85,8 +86,26 @@ describe("ReadUsersController", () => {
     })
 
     describe("list", () => {
-        it.todo("should return the list of users")
+        it("should return the list of users", async () => {
+            const { controller, userMock, requestMock, responseMock } = makeSut()
+            vitest.spyOn(usersRepositoryMock, "listAll").mockResolvedValueOnce([userMock])
 
-        it.todo("should return 500 if some error occur")
+            const promise = controller.list(requestMock, responseMock)
+
+            await expect(promise).resolves.not.toThrow()
+            expect(usersRepositoryMock.listAll).toHaveBeenCalledWith()
+            expect(responseMock.statusCode).toEqual(200)
+
+        })
+
+        it("should return 500 if some error occur", async () => {
+            const { controller, userMock, requestMock, responseMock } = makeSut()
+            vitest.spyOn(usersRepositoryMock, "listAll").mockRejectedValueOnce(new Error("some error"))
+            const promise = controller.list(requestMock, responseMock)
+
+            await expect(promise).resolves.not.toThrow()
+            expect(usersRepositoryMock.listAll).toHaveBeenCalledWith()
+            expect(responseMock.statusCode).toEqual(500)
+        })
     })
 })

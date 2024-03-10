@@ -1,6 +1,7 @@
 import { ReadBooksController } from "@/controllers/books/read.ts"
 import { Book, NewBook } from "@/interfaces/models/books.ts"
 import { fakerEN } from "@faker-js/faker"
+import { UUID } from "crypto"
 import { Request, Response } from "express"
 import { beforeEach, describe, expect, it, vitest } from "vitest"
 import { booksRepositoryMock } from "../../mocks/books_repository.ts"
@@ -19,13 +20,13 @@ describe("ReadBooksController", () => {
         }
 
         const bookMock: Book = {
-            id: fakerEN.string.uuid(),
+            id: fakerEN.string.uuid() as UUID,
             ...newBookMock,
         }
 
         const booksMock: Book[] = [
             {
-                id: fakerEN.string.uuid(),
+                id: fakerEN.string.uuid() as UUID,
                 title: fakerEN.word.words(),
                 subtitle: fakerEN.word.words(),
                 publishing_company: fakerEN.company.name(),
@@ -33,7 +34,7 @@ describe("ReadBooksController", () => {
                 author: fakerEN.internet.userName(),
             },
             {
-                id: fakerEN.string.uuid(),
+                id: fakerEN.string.uuid() as UUID,
                 title: fakerEN.word.words(),
                 subtitle: fakerEN.word.words(),
                 publishing_company: fakerEN.company.name(),
