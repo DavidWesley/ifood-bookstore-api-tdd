@@ -117,6 +117,7 @@ describe("ReadBooksController", () => {
             await expect(promise).resolves.not.toThrow()
             expect(responseMock.statusCode).toEqual(200)
             expect(booksRepositoryMock.listAll).toHaveBeenCalledOnce
+            expect(booksRepositoryMock.listAll).toReturnWith(booksMock)
         })
 
         it("should return 500 if some error occur", async () => {

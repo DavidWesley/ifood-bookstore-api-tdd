@@ -23,13 +23,31 @@ describe("UpdateBooksController", () => {
             author: fakerEN.internet.userName(),
         }
 
+        const nameConflictingBook: NewBook = {
+            title: "testeConflito",
+            subtitle: fakerEN.word.words(),
+            publishing_company: fakerEN.company.name(),
+            published_at: fakerEN.date.anytime(),
+            author: fakerEN.internet.userName(),
+        }
+
         const book: Book = {
             id: fakerEN.string.uuid() as UUID,
             ...newBook,
         }
 
+        const conflictingBook: Book = {
+            id: fakerEN.string.uuid() as UUID,
+            ...nameConflictingBook,
+        }
+
         const request = {
             body: newBook,
+            params: { id: book.id } as Request["params"],
+        } as Request
+
+        const nameConflictingRequest = {
+            body: nameConflictingBook,
             params: { id: book.id } as Request["params"],
         } as Request
 
@@ -46,8 +64,8 @@ describe("UpdateBooksController", () => {
 
         return {
             mocks: { controller },
-            stubs: { request, response },
-            objects: { newBook, book, },
+            stubs: { nameConflictingRequest, request, response },
+            objects: { newBook, book, conflictingBook },
         }
     }
 
@@ -67,9 +85,34 @@ describe("UpdateBooksController", () => {
         expect(stubs.response.statusCode).toEqual(StatusCodes.OK)
     })
 
-    it.todo("should return 404 statusCode and not update the book if there is no book with the id provided")
+    it("should return 404 statusCode and not update the book if there is no book with the id provided", async () => {
+        const { stubs, mocks, objects } = makeSut()
 
-    it.todo("should return 409 statusCode and not update the book if there is a book with the same title")
+        vitest.spyOn(booksRepositoryMock, "getById").mockResolvedValueOnce(undefined)
+        vitest.spyOn(booksRepositoryMock, "update")
+
+        const promise = mocks.controller.update(stubs.request, stubs.response)
+
+        await expect(promise).resolves.not.toThrow()
+        expect(booksRepositoryMock.getById).toHaveBeenCalledWith(objects.book.id)
+        expect(booksRepositoryMock.update).not.toHaveBeenCalled()
+        expect(stubs.response.statusCode).toEqual(StatusCodes.NOT_FOUND)
+    })
+
+    it("should return 409 statusCode and not update the book if there is a book with the same title", async () => {
+        const { stubs, mocks, objects } = makeSut()
+        vitest.spyOn(booksRepositoryMock, "getById").mockResolvedValueOnce(objects.book)
+        vitest.spyOn(booksRepositoryMock, "getByTitle").mockResolvedValueOnce(objects.conflictingBook)
+        vitest.spyOn(booksRepositoryMock, "update")
+
+        const promise = mocks.controller.update(stubs.nameConflictingRequest, stubs.response)
+
+        await expect(promise).resolves.not.toThrow()
+        expect(booksRepositoryMock.getById).toHaveBeenCalledWith(objects.book.id)
+        expect(booksRepositoryMock.getByTitle).toHaveBeenCalledWith(objects.conflictingBook.title)
+        expect(booksRepositoryMock.update).not.toHaveBeenCalled()
+        expect(stubs.response.statusCode).toEqual(StatusCodes.CONFLICT)
+    })
 
     it("should return 500 if some error occur", async () => {
         const { mocks, objects, stubs } = makeSut()
