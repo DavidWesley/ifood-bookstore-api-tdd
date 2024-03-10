@@ -3,6 +3,7 @@ import { BooksRental, NewBooksRental } from "@/interfaces/models/booksRental.ts"
 import { IBooksRentalRepository } from "@/interfaces/repositories/booksRental.ts"
 import { BooksRepository } from "@/repositories/books.ts"
 import { UsersRepository } from "@/repositories/users.ts"
+import { copyNonNullChangeableProperties } from "@/utils/copyNonNullChangeableProperties.ts"
 import { eq } from "drizzle-orm"
 
 export class BooksRentalRepository implements IBooksRentalRepository {
@@ -80,6 +81,20 @@ export class BooksRentalRepository implements IBooksRentalRepository {
     public async listAll(): Promise<BooksRental[]> {
         const bookRentals = await db.query.booksRental.findMany()
         return bookRentals.map(BooksRentalRepository.convert)
+    }
+
+    public async update(id: BooksRental["id"], booksRentalProperties: Partial<NewBooksRental>): Promise<BooksRental | undefined> {
+        const properties = copyNonNullChangeableProperties<Omit<BooksRental, "id">>(booksRentalProperties) as Omit<BooksRental, "id">
+
+        const [updatedBookRental] = await db
+            .update(schema.booksRental)
+            .set({ ...properties })
+            .where(eq(schema.booksRental.id, id))
+            .returning()
+
+        if (!updatedBookRental) return
+
+        return BooksRentalRepository.convert(updatedBookRental)
     }
 
     public async delete(id: BooksRental["id"]): Promise<void> {

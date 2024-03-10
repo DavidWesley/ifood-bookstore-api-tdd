@@ -5,5 +5,6 @@ export interface IBooksRentalRepository {
     getById(id: BooksRental["id"]): Promise<BooksRental | undefined>
     getByBookId(bookId: BooksRental["book_id"]): Promise<BooksRental | undefined>
     listAll(): Promise<BooksRental[]>
+    update(id: BooksRental["id"], booksRentalProperties: Partial<Omit<BooksRental, "id">>): Promise<BooksRental | undefined>
     delete(id: BooksRental["id"]): Promise<void>
 }
