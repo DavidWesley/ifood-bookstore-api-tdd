@@ -33,7 +33,6 @@ export class BooksRepository implements IBooksRepository {
             ])
             .returning()
 
-        console.log(createdBook)
         if (!createdBook) throw new Error("Não foi possível cadastrar no banco")
         return BooksRepository.convert(createdBook)
     }

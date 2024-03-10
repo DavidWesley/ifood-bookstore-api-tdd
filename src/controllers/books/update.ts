@@ -30,7 +30,6 @@ export class UpdateBooksController {
             }
 
             body.published_at = new Date(body.published_at)
-            console.log(body)
 
             await this.booksRepository.update(id, body)
 
