@@ -23,9 +23,28 @@ describe("ReadBooksController", () => {
             ...newBookMock,
         }
 
+        const booksMock: Book[] = [
+            {
+                id: fakerEN.string.uuid(),
+                title: fakerEN.word.words(),
+                subtitle: fakerEN.word.words(),
+                publishing_company: fakerEN.company.name(),
+                published_at: fakerEN.date.anytime(),
+                author: fakerEN.internet.userName(),
+            },
+            {
+                id: fakerEN.string.uuid(),
+                title: fakerEN.word.words(),
+                subtitle: fakerEN.word.words(),
+                publishing_company: fakerEN.company.name(),
+                published_at: fakerEN.date.anytime(),
+                author: fakerEN.internet.userName(),
+            },
+        ]
+
         const requestMock = {
             body: newBookMock,
-            params: { id: bookMock.id } as any,
+            params: { id: bookMock.id } as unknown,
         } as Request
 
         const responseMock = {
@@ -35,7 +54,7 @@ describe("ReadBooksController", () => {
                 return {
                     json: vitest.fn(),
                     send: vitest.fn(),
-                } as any
+                } as unknown
             },
         } as Response
 
@@ -43,6 +62,7 @@ describe("ReadBooksController", () => {
             controller,
             newBookMock,
             bookMock,
+            booksMock,
             requestMock,
             responseMock,
         }
@@ -88,8 +108,26 @@ describe("ReadBooksController", () => {
     })
 
     describe("list", () => {
-        it.todo("should return the list of books")
+        it("should return the list of books", async () => {
+            const { booksMock, requestMock, responseMock, controller } = makeSut()
+            vitest.spyOn(booksRepositoryMock, "listAll").mockResolvedValueOnce(booksMock)
 
-        it.todo("should return 500 if some error occur")
+            const promise = controller.list(requestMock, responseMock)
+
+            await expect(promise).resolves.not.toThrow()
+            expect(responseMock.statusCode).toEqual(200)
+            expect(booksRepositoryMock.listAll).toHaveBeenCalledOnce
+        })
+
+        it("should return 500 if some error occur", async () => {
+            const { controller, bookMock, requestMock, responseMock } = makeSut()
+            vitest.spyOn(booksRepositoryMock, "listAll").mockRejectedValueOnce(new Error("some error"))
+
+            const promise = controller.list(requestMock, responseMock)
+
+            await expect(promise).resolves.not.toThrow()
+            expect(booksRepositoryMock.listAll).toHaveBeenCalledOnce
+            expect(responseMock.statusCode).toEqual(500)
+        })
     })
 })
