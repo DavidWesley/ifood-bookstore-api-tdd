@@ -46,6 +46,11 @@ Now, follow the steps below to use the project:
    ```bash
    npm install
    ```
+4. **Run migrations:**
+   ```bash
+   cd src/db/
+   npx tsx migrate.ts
+   ```
 
 ## Usage
 
