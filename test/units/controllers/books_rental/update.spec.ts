@@ -4,29 +4,29 @@ import { StatusCodes } from "http-status-codes"
 import { beforeEach, describe, expect, it, vitest } from "vitest"
 
 import { UpdateBooksRentalController } from "@/controllers/books_rental/update.ts"
-import { BooksRental, NewBooksRental } from "@/interfaces/models/booksRental.ts"
+import { BookRental, NewBookRental } from "@/interfaces/models/bookRental.ts"
 
 import { booksRentalRepositoryMock } from "test/units/mocks/books_rental_repository.ts"
 import { logger } from "test/units/mocks/logger.ts"
 
 describe("UpdateBooksRentalController", () => {
     function makeSut() {
-        const createBooksRental: NewBooksRental = {
-            book_id: fakerEN.string.uuid() as BooksRental["book_id"],
-            user_id: fakerEN.string.uuid() as BooksRental["user_id"],
+        const createBooksRental: NewBookRental = {
+            book_id: fakerEN.string.uuid() as BookRental["book_id"],
+            user_id: fakerEN.string.uuid() as BookRental["user_id"],
             rented_at: fakerEN.date.anytime(),
             rental_time: fakerEN.date.anytime(),
         }
 
-        const booksRental: BooksRental = {
-            id: fakerEN.string.uuid() as BooksRental["id"],
+        const booksRental: BookRental = {
+            id: fakerEN.string.uuid() as BookRental["id"],
             ...createBooksRental,
         }
 
         const request = {
             body: createBooksRental,
             params: { id: booksRental.id } as Request["params"],
-        } as Request<{ id: BooksRental["id"] }, unknown, Omit<BooksRental, "id">>
+        } as Request<{ id: BookRental["id"] }, unknown, Omit<BookRental, "id">>
 
         const response = {
             statusCode: 0,
@@ -52,7 +52,7 @@ describe("UpdateBooksRentalController", () => {
     it("should update and return book rental if the book rental exist", async () => {
         const { stubs, objects } = makeSut()
         const controller = new UpdateBooksRentalController(logger, booksRentalRepositoryMock)
-        const updatedBookRental: NewBooksRental = {
+        const updatedBookRental: NewBookRental = {
             ...objects.createBooksRental,
             rented_at: new Date(fakerEN.date.anytime()),
         }
@@ -60,7 +60,7 @@ describe("UpdateBooksRentalController", () => {
         vitest.spyOn(booksRentalRepositoryMock, "getByBookId").mockResolvedValueOnce(undefined)
         vitest.spyOn(booksRentalRepositoryMock, "update").mockResolvedValueOnce({ ...objects.booksRental, ...updatedBookRental })
 
-        const expectedUpdatedBookRental: BooksRental = {
+        const expectedUpdatedBookRental: BookRental = {
             id: objects.booksRental.id,
             ...updatedBookRental,
         }
@@ -98,9 +98,9 @@ describe("UpdateBooksRentalController", () => {
         const { stubs, objects } = makeSut()
         const controller = new UpdateBooksRentalController(logger, booksRentalRepositoryMock)
 
-        const anotherBookRental: BooksRental = {
+        const anotherBookRental: BookRental = {
             ...objects.booksRental,
-            book_id: fakerEN.string.uuid() as BooksRental["book_id"],
+            book_id: fakerEN.string.uuid() as BookRental["book_id"],
         }
 
         vitest.spyOn(booksRentalRepositoryMock, "getById").mockResolvedValueOnce(objects.booksRental)

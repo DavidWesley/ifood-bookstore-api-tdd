@@ -1,16 +1,16 @@
 import { Request, Response } from "express"
 import { Logger } from "winston"
 
-import { NewBooksRental } from "@/interfaces/models/booksRental.ts"
-import { IBooksRentalRepository } from "@/interfaces/repositories/booksRental.ts"
+import { NewBookRental } from "@/interfaces/models/bookRental.ts"
+import { IBooksRentalsRepository } from "@/interfaces/repositories/booksRental.ts"
 
 export class CreateBooksRentalController {
     constructor(
         private readonly logger: Logger,
-        private readonly booksRentalRepository: IBooksRentalRepository
+        private readonly booksRentalRepository: IBooksRentalsRepository
     ) {}
 
-    public async create(req: Request<any, any, NewBooksRental>, res: Response): Promise<void> {
+    public async create(req: Request<any, any, NewBookRental>, res: Response): Promise<void> {
         const body = req.body
 
         try {

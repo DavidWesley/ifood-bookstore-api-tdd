@@ -3,7 +3,6 @@ import { Logger } from "winston"
 
 import { NewBook } from "@/interfaces/models/books.ts"
 import { IBooksRepository } from "@/interfaces/repositories/books.ts"
-
 export class CreateBooksController {
     constructor(
         private readonly logger: Logger,

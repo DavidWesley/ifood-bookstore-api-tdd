@@ -1,4 +1,4 @@
-import { IBooksRentalRepository } from "@/interfaces/repositories/booksRental.ts"
+import { IBooksRentalsRepository } from "@/interfaces/repositories/booksRental.ts"
 import { UUID } from "crypto"
 import { Request, Response } from "express"
 import { Logger } from "winston"
@@ -6,8 +6,8 @@ import { Logger } from "winston"
 export class DeleteBooksRentalController {
     constructor(
         private readonly logger: Logger,
-        private readonly booksRentalRepository: IBooksRentalRepository
-    ) { }
+        private readonly booksRentalRepository: IBooksRentalsRepository
+    ) {}
 
     public async delete(req: Request, res: Response): Promise<void> {
         const { id } = req.params

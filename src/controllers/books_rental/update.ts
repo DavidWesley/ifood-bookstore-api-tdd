@@ -1,5 +1,5 @@
-import { BooksRental, NewBooksRental } from "@/interfaces/models/booksRental.ts"
-import { IBooksRentalRepository } from "@/interfaces/repositories/booksRental.ts"
+import { BookRental, NewBookRental } from "@/interfaces/models/bookRental.ts"
+import { IBooksRentalsRepository } from "@/interfaces/repositories/booksRental.ts"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { Logger } from "winston"
@@ -7,10 +7,10 @@ import { Logger } from "winston"
 export class UpdateBooksRentalController {
     constructor(
         private readonly logger: Logger,
-        private readonly booksRentalRepository: IBooksRentalRepository
-    ) { }
+        private readonly booksRentalRepository: IBooksRentalsRepository
+    ) {}
 
-    public async update(req: Request<{ id: BooksRental["id"] }, unknown, NewBooksRental>, res: Response): Promise<BooksRental | undefined> {
+    public async update(req: Request<{ id: BookRental["id"] }, unknown, NewBookRental>, res: Response): Promise<BookRental | undefined> {
         const { id } = req.params
         const body = req.body
 

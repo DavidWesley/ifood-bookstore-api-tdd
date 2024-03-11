@@ -1,14 +1,15 @@
+import { UUID } from "node:crypto"
+
 import { Request, Response } from "express"
 import { Logger } from "winston"
 
 import { IBooksRepository } from "@/interfaces/repositories/books.ts"
-import { UUID } from "crypto"
 
 export class DeleteBooksController {
     constructor(
         private readonly logger: Logger,
         private readonly booksRepository: IBooksRepository
-    ) { }
+    ) {}
 
     public async delete(req: Request, res: Response): Promise<void> {
         const { id } = req.params

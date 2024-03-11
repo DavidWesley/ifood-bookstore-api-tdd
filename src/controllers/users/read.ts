@@ -7,7 +7,7 @@ export class ReadUsersController {
     constructor(
         private readonly logger: Logger,
         private readonly usersRepository: IUsersRepository
-    ) { }
+    ) {}
 
     public async getById(req: Request, res: Response): Promise<void> {
         const { id } = req.params
@@ -27,19 +27,14 @@ export class ReadUsersController {
     }
 
     public async list(req: Request, res: Response): Promise<void> {
-
         try {
             const user = await this.usersRepository.listAll()
             res.status(200).json(user)
             return
-
         } catch (err) {
             this.logger.error({ message: "error while retrieving users", error: err })
             res.status(500).json({ message: "something went wrong, try again latter!" })
             return
         }
     }
-
-
-
 }

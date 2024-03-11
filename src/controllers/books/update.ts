@@ -8,7 +8,7 @@ export class UpdateBooksController {
     constructor(
         private readonly logger: Logger,
         private readonly booksRepository: IBooksRepository
-    ) { }
+    ) {}
 
     public async update(req: Request<any, any, NewBook>, res: Response): Promise<void> {
         const { id } = req.params

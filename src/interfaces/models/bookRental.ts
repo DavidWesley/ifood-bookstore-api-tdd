@@ -1,8 +1,8 @@
-import { UUID } from "crypto"
+import { UUID } from "node:crypto"
 import { Book } from "./books.ts"
 import { User } from "./users.ts"
 
-export type BooksRental = {
+export type BookRental = {
     id: UUID
     book_id: Book["id"]
     book?: Book
@@ -12,4 +12,4 @@ export type BooksRental = {
     rental_time: Date
 }
 
-export type NewBooksRental = Omit<BooksRental, "id" | "book" | "user">
+export type NewBookRental = Omit<BookRental, "id" | "book" | "user">

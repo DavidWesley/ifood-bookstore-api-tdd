@@ -4,22 +4,22 @@ import { StatusCodes } from "http-status-codes"
 import { beforeEach, describe, expect, it, vitest } from "vitest"
 
 import { CreateBooksRentalController } from "@/controllers/books_rental/create.ts"
-import { BooksRental, NewBooksRental } from "@/interfaces/models/booksRental.ts"
+import { BookRental, NewBookRental } from "@/interfaces/models/bookRental.ts"
 
 import { booksRentalRepositoryMock } from "test/units/mocks/books_rental_repository.ts"
 import { logger } from "test/units/mocks/logger.ts"
 
 describe("CreateBooksRentalController", () => {
     function makeSut() {
-        const newBooksRental: NewBooksRental = {
-            book_id: fakerEN.string.uuid() as BooksRental["book_id"],
-            user_id: fakerEN.string.uuid() as BooksRental["user_id"],
+        const newBooksRental: NewBookRental = {
+            book_id: fakerEN.string.uuid() as BookRental["book_id"],
+            user_id: fakerEN.string.uuid() as BookRental["user_id"],
             rented_at: fakerEN.date.anytime(),
             rental_time: fakerEN.date.anytime(),
         }
 
-        const booksRental: BooksRental = {
-            id: fakerEN.string.uuid() as BooksRental["id"],
+        const booksRental: BookRental = {
+            id: fakerEN.string.uuid() as BookRental["id"],
             ...newBooksRental,
         }
 

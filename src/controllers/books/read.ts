@@ -1,13 +1,15 @@
-import { IBooksRepository } from "@/interfaces/repositories/books.ts"
-import { UUID } from "crypto"
+import { UUID } from "node:crypto"
+
 import { Request, Response } from "express"
 import { Logger } from "winston"
+
+import { IBooksRepository } from "@/interfaces/repositories/books.ts"
 
 export class ReadBooksController {
     constructor(
         private readonly logger: Logger,
         private readonly booksRepository: IBooksRepository
-    ) { }
+    ) {}
 
     public async getById(req: Request, res: Response): Promise<void> {
         const { id } = req.params

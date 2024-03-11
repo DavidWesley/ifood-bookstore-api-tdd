@@ -1,10 +1,10 @@
-import { BooksRental, NewBooksRental } from "../models/booksRental.ts"
+import { BookRental, NewBookRental } from "../models/bookRental.ts"
 
-export interface IBooksRentalRepository {
-    create(newBookRental: NewBooksRental): Promise<BooksRental>
-    getById(id: BooksRental["id"]): Promise<BooksRental | undefined>
-    getByBookId(bookId: BooksRental["book_id"]): Promise<BooksRental | undefined>
-    listAll(): Promise<BooksRental[]>
-    update(id: BooksRental["id"], booksRentalProperties: Partial<Omit<BooksRental, "id">>): Promise<BooksRental | undefined>
-    delete(id: BooksRental["id"]): Promise<void>
+export interface IBooksRentalsRepository {
+    create(newBookRental: NewBookRental): Promise<BookRental>
+    getById(id: BookRental["id"]): Promise<BookRental | undefined>
+    getByBookId(bookId: BookRental["book_id"]): Promise<BookRental | undefined>
+    listAll(): Promise<BookRental[]>
+    update(id: BookRental["id"], bookRentalProperties: Partial<Omit<BookRental, "id">>): Promise<BookRental | undefined>
+    delete(id: BookRental["id"]): Promise<void>
 }
