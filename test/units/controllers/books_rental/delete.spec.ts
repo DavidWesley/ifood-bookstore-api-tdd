@@ -1,50 +1,47 @@
+import { fakerEN } from "@faker-js/faker"
+import { Request, Response } from "express"
+import { StatusCodes } from "http-status-codes"
+import { beforeEach, describe, expect, it, vitest } from "vitest"
+
 import { DeleteBooksRentalController } from "@/controllers/books_rental/delete.ts"
 import { BooksRental, NewBooksRental } from "@/interfaces/models/booksRental.ts"
-import { fakerEN } from "@faker-js/faker"
-import { UUID } from "crypto"
-import { Request, Response } from "express"
-import { beforeEach, describe, expect, it, vitest } from "vitest"
-import { booksRentalRepositoryMock } from "../../mocks/books_rental_repository.ts"
-import { logger } from "../../mocks/logger.ts"
+
+import { booksRentalRepositoryMock } from "test/units/mocks/books_rental_repository.ts"
+import { logger } from "test/units/mocks/logger.ts"
 
 describe("DeleteBooksRentalController", () => {
     function makeSut() {
-        const controller = new DeleteBooksRentalController(logger, booksRentalRepositoryMock)
-
-        const newBooksRentalMock: NewBooksRental = {
-            book_id: fakerEN.string.uuid() as UUID,
-            user_id: fakerEN.string.uuid() as UUID,
+        const newBooksRental: NewBooksRental = {
+            book_id: fakerEN.string.uuid() as BooksRental["book_id"],
+            user_id: fakerEN.string.uuid() as BooksRental["user_id"],
             rented_at: fakerEN.date.anytime(),
             rental_time: fakerEN.date.anytime(),
         }
 
-        const booksRentalMock: BooksRental = {
-            id: fakerEN.string.uuid() as UUID,
-            ...newBooksRentalMock,
+        const booksRental: BooksRental = {
+            id: fakerEN.string.uuid() as BooksRental["id"],
+            ...newBooksRental,
         }
 
-        const requestMock = {
-            body: newBooksRentalMock,
-            params: { id: booksRentalMock.id } as any,
+        const request = {
+            body: newBooksRental,
+            params: { id: booksRental.id } as Request["params"],
         } as Request
 
-        const responseMock = {
+        const response = {
             statusCode: 0,
             status: (status: number) => {
-                responseMock.statusCode = status
+                response.statusCode = status
                 return {
                     json: vitest.fn(),
                     send: vitest.fn(),
-                } as any
+                } as unknown
             },
         } as Response
 
         return {
-            controller,
-            newBooksRentalMock,
-            booksRentalMock,
-            requestMock,
-            responseMock,
+            stubs: { request, response },
+            objects: { newBooksRental, booksRental },
         }
     }
 
@@ -53,41 +50,44 @@ describe("DeleteBooksRentalController", () => {
     })
 
     it("should delete the book rental if the book exist", async () => {
-        const { controller, newBooksRentalMock, booksRentalMock, requestMock, responseMock } = makeSut()
-        vitest.spyOn(booksRentalRepositoryMock, "getById").mockResolvedValueOnce(booksRentalMock)
+        const { objects, stubs } = makeSut()
+        const controller = new DeleteBooksRentalController(logger, booksRentalRepositoryMock)
+        vitest.spyOn(booksRentalRepositoryMock, "getById").mockResolvedValueOnce(objects.booksRental)
         vitest.spyOn(booksRentalRepositoryMock, "delete").mockResolvedValueOnce()
 
-        const promise = controller.delete(requestMock, responseMock)
+        const promise = controller.delete(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRentalRepositoryMock.getById).toHaveBeenCalledWith(booksRentalMock.id)
-        expect(booksRentalRepositoryMock.delete).toHaveBeenCalledWith(booksRentalMock.id)
-        expect(responseMock.statusCode).toEqual(200)
+        expect(booksRentalRepositoryMock.getById).toHaveBeenCalledWith(objects.booksRental.id)
+        expect(booksRentalRepositoryMock.delete).toHaveBeenCalledWith(objects.booksRental.id)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.OK)
     })
 
     it("should not delete the book rental if there is no rental with the same id", async () => {
-        const { controller, newBooksRentalMock, booksRentalMock, requestMock, responseMock } = makeSut()
+        const { objects, stubs } = makeSut()
+        const controller = new DeleteBooksRentalController(logger, booksRentalRepositoryMock)
         vitest.spyOn(booksRentalRepositoryMock, "getById").mockResolvedValueOnce(undefined)
         vitest.spyOn(booksRentalRepositoryMock, "delete")
 
-        const promise = controller.delete(requestMock, responseMock)
+        const promise = controller.delete(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRentalRepositoryMock.getById).toHaveBeenCalledWith(booksRentalMock.id)
+        expect(booksRentalRepositoryMock.getById).toHaveBeenCalledWith(objects.booksRental.id)
         expect(booksRentalRepositoryMock.delete).not.toHaveBeenCalled()
-        expect(responseMock.statusCode).toEqual(409)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.CONFLICT)
     })
 
     it("should return 500 if some error occur", async () => {
-        const { controller, newBooksRentalMock, booksRentalMock, requestMock, responseMock } = makeSut()
+        const { objects, stubs } = makeSut()
+        const controller = new DeleteBooksRentalController(logger, booksRentalRepositoryMock)
         vitest.spyOn(booksRentalRepositoryMock, "getById").mockRejectedValueOnce(new Error("some error"))
         vitest.spyOn(booksRentalRepositoryMock, "delete")
 
-        const promise = controller.delete(requestMock, responseMock)
+        const promise = controller.delete(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRentalRepositoryMock.getById).toHaveBeenCalledWith(booksRentalMock.id)
+        expect(booksRentalRepositoryMock.getById).toHaveBeenCalledWith(objects.booksRental.id)
         expect(booksRentalRepositoryMock.delete).not.toHaveBeenCalled()
-        expect(responseMock.statusCode).toEqual(500)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
     })
 })

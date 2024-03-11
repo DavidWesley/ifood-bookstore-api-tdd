@@ -1,17 +1,17 @@
+import { fakerEN } from "@faker-js/faker"
+import { Request, Response } from "express"
+import { StatusCodes } from "http-status-codes"
+import { beforeEach, describe, expect, it, vitest } from "vitest"
+
 import { CreateBooksController } from "@/controllers/books/create.ts"
 import { Book, NewBook } from "@/interfaces/models/books.ts"
-import { fakerEN } from "@faker-js/faker"
-import { UUID } from "crypto"
-import { Request, Response } from "express"
-import { beforeEach, describe, expect, it, vitest } from "vitest"
-import { booksRepositoryMock } from "../../mocks/books_repository.ts"
-import { logger } from "../../mocks/logger.ts"
+
+import { booksRepositoryMock } from "test/units/mocks/books_repository.ts"
+import { logger } from "test/units/mocks/logger.ts"
 
 describe("CreateBooksController", () => {
     function makeSut() {
-        const controller = new CreateBooksController(logger, booksRepositoryMock)
-
-        const newBookMock: NewBook = {
+        const newBook: NewBook = {
             title: fakerEN.word.words(),
             subtitle: fakerEN.word.words(),
             publishing_company: fakerEN.company.name(),
@@ -19,29 +19,30 @@ describe("CreateBooksController", () => {
             author: fakerEN.internet.userName(),
         }
 
-        const bookMock: Book = {
-            id: fakerEN.string.uuid() as UUID,
-            ...newBookMock,
+        const book: Book = {
+            id: fakerEN.string.uuid() as Book["id"],
+            ...newBook,
         }
 
-        const requestMock = { body: newBookMock } as Request
+        const request = {
+            body: newBook,
+            params: { id: book.id } as Request["params"],
+        } as Request
 
-        const responseMock = {
+        const response = {
             statusCode: 0,
             status: (status: number) => {
-                responseMock.statusCode = status
+                response.statusCode = status
                 return {
                     json: vitest.fn(),
-                } as any
+                    send: vitest.fn(),
+                } as unknown
             },
         } as Response
 
         return {
-            controller,
-            newBookMock,
-            bookMock,
-            requestMock,
-            responseMock,
+            objects: { newBook, book },
+            stubs: { request, response },
         }
     }
 
@@ -50,39 +51,42 @@ describe("CreateBooksController", () => {
     })
 
     it("should create book if there is no other book with the same title", async () => {
-        const { controller, newBookMock, bookMock, requestMock, responseMock } = makeSut()
+        const { stubs, objects } = makeSut()
+        const controller = new CreateBooksController(logger, booksRepositoryMock)
         vitest.spyOn(booksRepositoryMock, "getByTitle").mockResolvedValueOnce(undefined)
-        vitest.spyOn(booksRepositoryMock, "create").mockResolvedValueOnce(bookMock)
+        vitest.spyOn(booksRepositoryMock, "create").mockResolvedValueOnce(objects.book)
 
-        const promise = controller.create(requestMock, responseMock)
+        const promise = controller.create(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRepositoryMock.getByTitle).toHaveBeenCalledWith(newBookMock.title)
-        expect(booksRepositoryMock.create).toHaveBeenCalledWith(newBookMock)
-        expect(responseMock.statusCode).toEqual(201)
+        expect(booksRepositoryMock.getByTitle).toHaveBeenCalledWith(objects.newBook.title)
+        expect(booksRepositoryMock.create).toHaveBeenCalledWith(objects.newBook)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.CREATED)
     })
 
     it("should return 409 if there is other book with the same title", async () => {
-        const { controller, newBookMock, bookMock, requestMock, responseMock } = makeSut()
-        vitest.spyOn(booksRepositoryMock, "getByTitle").mockResolvedValueOnce(bookMock)
+        const { stubs, objects } = makeSut()
+        const controller = new CreateBooksController(logger, booksRepositoryMock)
+        vitest.spyOn(booksRepositoryMock, "getByTitle").mockResolvedValueOnce(objects.book)
         vitest.spyOn(booksRepositoryMock, "create")
 
-        const promise = controller.create(requestMock, responseMock)
+        const promise = controller.create(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRepositoryMock.getByTitle).toHaveBeenCalledWith(newBookMock.title)
+        expect(booksRepositoryMock.getByTitle).toHaveBeenCalledWith(objects.newBook.title)
         expect(booksRepositoryMock.create).not.toHaveBeenCalled()
-        expect(responseMock.statusCode).toEqual(409)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.CONFLICT)
     })
 
     it("should return 500 if some error occur", async () => {
-        const { controller, newBookMock, bookMock, requestMock, responseMock } = makeSut()
+        const { stubs, objects } = makeSut()
+        const controller = new CreateBooksController(logger, booksRepositoryMock)
         vitest.spyOn(booksRepositoryMock, "getByTitle").mockRejectedValueOnce(new Error("some error"))
 
-        const promise = controller.create(requestMock, responseMock)
+        const promise = controller.create(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
-        expect(booksRepositoryMock.getByTitle).toHaveBeenCalledWith(newBookMock.title)
-        expect(responseMock.statusCode).toEqual(500)
+        expect(booksRepositoryMock.getByTitle).toHaveBeenCalledWith(objects.newBook.title)
+        expect(stubs.response.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
     })
 })

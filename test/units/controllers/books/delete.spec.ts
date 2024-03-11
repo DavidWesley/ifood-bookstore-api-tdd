@@ -1,5 +1,3 @@
-import { UUID } from "node:crypto"
-
 import { fakerEN } from "@faker-js/faker"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
@@ -8,13 +6,11 @@ import { beforeEach, describe, expect, it, vitest } from "vitest"
 import { DeleteBooksController } from "@/controllers/books/delete.ts"
 import { Book, NewBook } from "@/interfaces/models/books.ts"
 
-import { booksRepositoryMock } from "../../mocks/books_repository.ts"
-import { logger } from "../../mocks/logger.ts"
+import { booksRepositoryMock } from "test/units/mocks/books_repository.ts"
+import { logger } from "test/units/mocks/logger.ts"
 
 describe("DeleteBooksController", () => {
     function makeSut() {
-        const controller = new DeleteBooksController(logger, booksRepositoryMock)
-
         const newBook: NewBook = {
             title: fakerEN.word.words(),
             subtitle: fakerEN.word.words(),
@@ -24,7 +20,7 @@ describe("DeleteBooksController", () => {
         }
 
         const book: Book = {
-            id: fakerEN.string.uuid() as UUID,
+            id: fakerEN.string.uuid() as Book["id"],
             ...newBook,
         }
 
@@ -45,9 +41,8 @@ describe("DeleteBooksController", () => {
         } as Response
 
         return {
-            mocks: { controller, },
             objects: { newBook, book },
-            stubs: { request, response }
+            stubs: { request, response },
         }
     }
 
@@ -56,11 +51,12 @@ describe("DeleteBooksController", () => {
     })
 
     it("should delete the book if the book exist", async () => {
-        const { mocks, objects, stubs } = makeSut()
+        const { objects, stubs } = makeSut()
+        const controller = new DeleteBooksController(logger, booksRepositoryMock)
         vitest.spyOn(booksRepositoryMock, "getById").mockResolvedValueOnce(objects.book)
         vitest.spyOn(booksRepositoryMock, "delete").mockResolvedValueOnce()
 
-        const promise = mocks.controller.delete(stubs.request, stubs.response)
+        const promise = controller.delete(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
         expect(booksRepositoryMock.getById).toHaveBeenCalledWith(objects.book.id)
@@ -69,11 +65,12 @@ describe("DeleteBooksController", () => {
     })
 
     it("should not delete the book if there is no book with the id provided", async () => {
-        const { mocks, objects, stubs } = makeSut()
+        const { objects, stubs } = makeSut()
+        const controller = new DeleteBooksController(logger, booksRepositoryMock)
         vitest.spyOn(booksRepositoryMock, "getById").mockResolvedValueOnce(undefined)
         vitest.spyOn(booksRepositoryMock, "delete")
 
-        const promise = mocks.controller.delete(stubs.request, stubs.response)
+        const promise = controller.delete(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
         expect(booksRepositoryMock.getById).toHaveBeenCalledWith(objects.book.id)
@@ -82,11 +79,12 @@ describe("DeleteBooksController", () => {
     })
 
     it("should return 500 if some error occur", async () => {
-        const { mocks, objects, stubs } = makeSut()
+        const { objects, stubs } = makeSut()
+        const controller = new DeleteBooksController(logger, booksRepositoryMock)
         vitest.spyOn(booksRepositoryMock, "getById").mockRejectedValueOnce(new Error("some error"))
         vitest.spyOn(booksRepositoryMock, "delete")
 
-        const promise = mocks.controller.delete(stubs.request, stubs.response)
+        const promise = controller.delete(stubs.request, stubs.response)
 
         await expect(promise).resolves.not.toThrow()
         expect(booksRepositoryMock.getById).toHaveBeenCalledWith(objects.book.id)
