@@ -148,6 +148,13 @@ For additional details on each route, please refer to [Routes.md](./docs/Routes.
 Refer to [Routes.md](./docs/Routes.md) for detailed documentation on each route.
 
 
+## Entity Relationship
+
+![image](./docs/assets/bookstore-api-tables-relations.svg)
+
+
+The most updated version of the image above can be found at [Diagrama](https://dbdiagram.io/d/Bookstore-api-tdd-db-relations-65ee4699b1f3d4062c933a67)
+
 ## Contributors
 
 I appreciate all the individuals who have contributed to this project! 🙌

@@ -1,0 +1,39 @@
+table books {
+  id text(36) [pk, not null, unique]
+  title text(255) [not null]
+  subtitle text(255) [not null]
+  author text(255) [not null]
+  publishing_company text(255) [not null]
+  published_at integer
+  created_at integer [not null]
+  updated_at integer
+  deleted_at integer
+
+  indexes {
+    (title, author) [name: 'book_idx', unique]
+  }
+}
+
+table books_rental {
+  id text(36) [pk, not null, unique]
+  book_id text(36) [not null]
+  user_id text(36) [not null]
+  rented_at integer
+  rental_time integer
+  created_at integer [not null]
+  updated_at integer
+  deleted_at integer
+}
+
+table users {
+  id text(36) [pk, not null, unique]
+  name text(255) [not null]
+  email text(255) [not null, unique]
+  created_at integer [not null]
+  updated_at integer
+  deleted_at integer
+}
+
+ref: books_rental.book_id - books.id
+
+ref: books_rental.user_id - users.id
