@@ -5,7 +5,7 @@ export default {
     out: './drizzle',
     driver: 'better-sqlite',
     dbCredentials: {
-        url: `./sqlite.${process.env.NODE_ENV ?? "development"}.db`
+        url: "./sqlite.db"
     },
     verbose: true
 } satisfies Config
