@@ -19,9 +19,7 @@
     "lint": "biome lint ./src --diagnostic-level=error",
     "format": "biome format ./src --write --diagnostic-level=warn",
 
-    "db:migrate": "cd src/db ; tsx migrate.ts",
-
-    "prepare": "husky install ; npm run db:migrate"
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
