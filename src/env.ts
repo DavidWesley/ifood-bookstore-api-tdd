@@ -1,5 +1,5 @@
-import * as dotEnv from "dotenv"
 import path from "node:path"
+import * as dotEnv from "dotenv"
 import { z } from "zod"
 
 // biome-ignore lint/complexity/useLiteralKeys: avoiding lint confusion
@@ -12,7 +12,7 @@ dotEnv.config({ path: ENV_FILE_PATH })
 
 const envSchema = z.object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-    PORT: z.coerce.number().positive().min(80).max(65_000),
+    PORT: z.coerce.number().positive().min(80).max(65_000).default(3000),
     // DB_HOST: z.string().ip().default("127.0.0.1"),
     // DB_USERNAME: z.string(),
     // DB_PASSWORD: z.string(),
