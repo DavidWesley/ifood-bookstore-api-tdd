@@ -7,9 +7,9 @@
     "dist"
   ],
   "scripts": {
-    "test": "vitest --watch false",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test": "cross-env NODE_ENV=test vitest --watch false",
+    "test:watch": "cross-env NODE_ENV=test vitest",
+    "test:coverage": "cross-env NODE_ENV=test vitest run --coverage",
     "lint": "biome lint ./src --diagnostic-level=error",
     "format": "biome format ./src --write --diagnostic-level=warn",
     "start": "cross-env NODE_ENV=production node dist/main.js",
